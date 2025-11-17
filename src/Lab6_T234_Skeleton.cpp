@@ -18,9 +18,9 @@ String command;
 
 // PID constants
 //** Modify these value for Task 2-4
-double kp = 0.5;
-double ki = 0.5;
-double kd = 0.3;
+double kp = 0.07;
+double ki = 0.0001;
+double kd = 0.001;
 
 // PID Varibles
 unsigned long currentTime, previousTime;
@@ -33,7 +33,7 @@ double cumError, rateError;
 // set desired position to 90 degrees
 double setPoint = 90.0;
 
-int Task = 2; // Change this according to the task that you are doing
+int Task = 4; // Change this according to the task that you are doing
 
 void TaskConfig()
 {
@@ -45,7 +45,19 @@ void TaskConfig()
   else if (Task == 3)
     kd = 0;
 }
+// **Some value needs to be changed in order to use this
+double getPosition()
+{
+  // Calculate the current position based on encoder count
+  position = float(encoderCount) * 360.0 / 1000.0; // Replace 1000.0 with the actual counts per revolution
 
+  if (position < 0)
+  {
+    position = position + 360; // Ensure position is positive
+  }
+
+  return position;
+}
 // PID Controller
 double computePID(double inp)
 {
@@ -92,19 +104,7 @@ void serialGraph()
 }
 // To get the current position
 
-// **Some value needs to be changed in order to use this
-double getPosition()
-{
-  // Calculate the current position based on encoder count
-  position = float(encoderCount) * 360.0 / 1000.0; // Replace 1000.0 with the actual counts per revolution
 
-  if (position < 0)
-  {
-    position = position + 360; // Ensure position is positive
-  }
-
-  return position;
-}
 
 void setup()
 {
@@ -130,7 +130,6 @@ void setup()
 
   /* set up baud rate  */
   Serial.begin(115200);
-  delay(1000);
 }
 
 void loop()
@@ -146,8 +145,6 @@ void loop()
     /*Forward rotation direction*/
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, HIGH);
-    /*Set a speed for your motor*/
-    analogWrite(MOTOR_ENA, output);
   }
   else
   {
@@ -155,10 +152,8 @@ void loop()
     /*Forward rotation direction*/
     digitalWrite(MOTOR_IN1, HIGH);
     digitalWrite(MOTOR_IN2, LOW);
-    /*Set a speed for your motor*/
-    analogWrite(MOTOR_ENA, output);
   }
-  analogWrite(MOTOR_ENA, (128 + int(abs(output)))); // Replace 128 with the the threshold value for your motor to move
+  analogWrite(MOTOR_ENA, (140 + int(abs(output)))); // Replace 128 with the the threshold value for your motor to move
 
   // display position, setPoint and outout of controller in Serial Plotter
   serialGraph();
@@ -167,5 +162,5 @@ void loop()
   {
     encoderCount = 0;
   }
-  delay(50);
+  delay(20);
 }
